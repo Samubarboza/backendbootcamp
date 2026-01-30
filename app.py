@@ -5,12 +5,17 @@ import os
 from models import db
 from models import Favorite
 
+# instancia Flask
 app = Flask(__name__)
 
+# BASE_DIR guarda la ruta absoluta de la carpeta donde está este archivo (.py)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# DB_PATH (usando BASE_DIR) construye la ruta completa al archivo de la base de datos (app.db)
 DB_PATH = os.path.join(BASE_DIR, "instance", "app.db")
 
+# le decimos a flask + alchemy donde esta la base de datos sqlite
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+# desactivamos seguimiento interno para no consumir recursos
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -42,6 +47,7 @@ def index():
     return render_template("index.html", characters=data["results"], info=data["info"], page=int(page), search=False)
 
 
+# ruta para guardar personajes a la db
 @app.route("/save", methods=["POST"])
 def save():
     api_id = request.form["api_id"]
@@ -53,7 +59,7 @@ def save():
         db.session.add(fav)
         db.session.commit()
 
-    return redirect("/")
+        
 
 # ruta de los peronajes favoritos que se guardan en la base de datios
 @app.route("/favorites")

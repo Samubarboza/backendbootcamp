@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-
+# instancia de sqlalchemy
 db = SQLAlchemy()
-
+# clase que crea las tablas con el modelo base de sqlalchemy
 class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     api_id = db.Column(db.Integer, unique=True)
