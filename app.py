@@ -53,13 +53,14 @@ def save():
     api_id = request.form["api_id"]
     name = request.form["name"]
     image = request.form["image"]
+    page = request.form.get('page', 1)
 
     if not Favorite.query.filter_by(api_id=api_id).first():
         fav = Favorite(api_id=api_id, name=name, image=image)
         db.session.add(fav)
         db.session.commit()
 
-    return redirect("/")
+    return redirect(f"/?page={page}")
 
         
 
