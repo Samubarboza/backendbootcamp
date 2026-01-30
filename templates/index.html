@@ -3,55 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <title>Rick and Morty</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
+<body class="min-h-screen bg-slate-950 text-slate-100">
 
-<h1>Rick and Morty</h1>
-<!-- Formulario para busqueda de personajes + enlaces de inicio y favoritos-->
-<form method="get">
-    <input type="text" name="name" placeholder="Search character">
-    <button type="submit">Search</button>
-    <a href="/">Inicio</a>
-    <a href="/favorites">Favorites</a>
-</form>
-<!-- Plantilla de mensaje de error si no hay personajes-->
-<hr>
-{% if error_message %}
-<p style="color: red; font-weight: bold;">{{ error_message }}</p>
-{% endif %}
+<!-- Fondo estilo portal -->
+<div class="pointer-events-none fixed inset-0">
+    <div class="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_0%,rgba(34,197,94,0.25),rgba(2,6,23,0))]"></div>
+    <div class="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.25),rgba(2,6,23,0)_60%)] blur-2xl"></div>
+</div>
 
-<!-- Plantilla para mostrar personajes con datos extraidos de la iteracion -->
-<ul>
-{% for c in characters %}
-    <li>
-        <strong>{{ c.name }}</strong><br>
-        Status: {{ c.status }}<br>
-        Species: {{ c.species }}<br>
-        Origin: {{ c.origin.name }}<br>
-        <img src="{{ c.image }}" width="120"><br>
+<div class="relative mx-auto max-w-6xl px-4 py-10">
 
-        <form method="post" action="/save">
-            <input type="hidden" name="api_id" value="{{ c.id }}">
-            <input type="hidden" name="name" value="{{ c.name }}">
-            <input type="hidden" name="image" value="{{ c.image }}">
-            <button type="submit">Guardar</button>
+    <!-- HEADER -->
+    <header class="mb-10 rounded-2xl border border-emerald-400/20 bg-slate-900/40 p-6 backdrop-blur shadow-[0_0_0_1px_rgba(16,185,129,0.15),0_12px_50px_-18px_rgba(34,197,94,0.45)]">
+
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+                <h1 class="text-4xl font-black tracking-tight">
+                    <span class="bg-gradient-to-r from-emerald-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">
+                        Rick and Morty
+                    </span>
+                </h1>
+                <p class="mt-2 text-sm text-slate-300">
+                    Search characters and save your favorites.
+                </p>
+            </div>
+
+            <nav class="flex gap-3">
+                <a href="/"
+                   class="rounded-xl border border-emerald-400/20 bg-slate-950/40 px-4 py-2 text-sm font-semibold hover:bg-slate-900/60">
+                    Inicio
+                </a>
+                <a href="/favorites"
+                   class="rounded-xl border border-cyan-400/20 bg-slate-950/40 px-4 py-2 text-sm font-semibold hover:bg-slate-900/60"
+                   id="favorites-link">
+                    Favorites
+                </a>
+            </nav>
+
+        </div>
+
+        <!-- SEARCH -->
+        <form method="get" class="mt-6 flex flex-col gap-3 sm:flex-row">
+            <input
+                type="text"
+                name="name"
+                placeholder="Search character"
+                class="flex-1 rounded-xl border border-emerald-400/20 bg-slate-950/40 px-4 py-3 text-sm outline-none placeholder:text-slate-500 focus:border-emerald-300/40 focus:ring-2 focus:ring-emerald-400/20"
+            >
+            <button
+                type="submit"
+                class="rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-6 py-3 text-sm font-black text-slate-950 hover:brightness-110">
+                Search
+            </button>
         </form>
-    </li>
 
-    <hr>
-{% endfor %}
-</ul>
+    </header>
 
-<!-- Plantilla para mostrar paginacion si es que no hay busqueda -->
-{% if not search %}
-    {% if info.prev %}
-        <a href="/?page={{ page - 1 }}">Previous</a>
+    <!-- ERROR -->
+    {% if error_message %}
+        <div class="mb-6 rounded-xl border border-rose-400/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-200">
+            <strong>Error:</strong> {{ error_message }}
+        </div>
     {% endif %}
-    Page {{ page }}
-    {% if info.next %}
-        <a href="/?page={{ page + 1 }}">Next</a>
-    {% endif %}
-{% endif %}
 
+    <!-- CHARACTERS GRID -->
+    <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {% for c in characters %}
+        <li class="rounded-2xl border border-emerald-400/15 bg-slate-900/35 p-4 shadow-[0_0_0_1px_rgba(16,185,129,0.08),0_20px_60px_-35px_rgba(34,197,94,0.45)] backdrop-blur">
+
+            <div class="flex gap-4">
+                <img src="{{ c.image }}"
+                     alt="{{ c.name }}"
+                     class="h-24 w-24 rounded-xl border border-slate-800 object-cover">
+
+                <div class="flex-1 min-w-0">
+                    <strong class="block truncate text-lg font-black">
+                        {{ c.name }}
+                    </strong>
+
+                    <p class="mt-1 text-xs text-slate-300">
+                        <span class="font-semibold">Status:</span> {{ c.status }}
+                    </p>
+                    <p class="text-xs text-slate-300">
+                        <span class="font-semibold">Species:</span> {{ c.species }}
+                    </p>
+                    <p class="text-xs text-slate-300 truncate">
+                        <span class="font-semibold">Origin:</span> {{ c.origin.name }}
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" action="/save" class="mt-4">
+                <input type="hidden" name="api_id" value="{{ c.id }}">
+                <input type="hidden" name="name" value="{{ c.name }}">
+                <input type="hidden" name="image" value="{{ c.image }}">
+
+                <button
+                    type="submit"
+                    class="w-full rounded-xl border border-emerald-400/25 bg-slate-950/40 px-4 py-2 text-xs font-black text-emerald-100 hover:bg-slate-900/60">
+                    Guardar
+                </button>
+            </form>
+
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- PAGINATION -->
+    {% if not search %}
+        <div class="mt-10 flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/30 px-5 py-4">
+            <div class="text-sm text-slate-300">
+                Page <span class="font-black text-white">{{ page }}</span>
+            </div>
+
+            <div class="flex gap-2">
+                {% if info.prev %}
+                    <a href="/?page={{ page - 1 }}"
+                       class="rounded-lg border border-slate-700 px-4 py-2 text-sm hover:bg-slate-800">
+                        Previous
+                    </a>
+                {% endif %}
+                {% if info.next %}
+                    <a href="/?page={{ page + 1 }}"
+                       class="rounded-lg bg-gradient-to-r from-cyan-300 to-emerald-300 px-4 py-2 text-sm font-black text-slate-950">
+                        Next
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+<div id="portal-overlay" style="
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: rgba(0,0,0,0.7);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;">
+    <img src="{{ url_for('static', filename='img/portal.gif') }}" alt="portal"
+    styles="width: 550px; height: 550px; object-fit: contain;">
+</div>
+
+<script src="{{ url_for('static', filename='js/frontend.js') }}"></script>
 </body>
 </html>

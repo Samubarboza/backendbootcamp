@@ -59,6 +59,8 @@ def save():
         db.session.add(fav)
         db.session.commit()
 
+    return redirect("/")
+
         
 
 # ruta de los peronajes favoritos que se guardan en la base de datios
